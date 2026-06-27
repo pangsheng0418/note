@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聲易記 - Smart Voice Expense Tracker</title>
+    <!-- Google Fonts: Outfit for numbers/headings, Noto Sans TC for Chinese -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Background decorative glows -->
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+
+        <!-- Sidebar / Header Area -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                </div>
+                <div class="logo-text">
+                    <h1>聲易記</h1>
+                    <span>Voice Expense Tracker</span>
+                </div>
+            </div>
+
+            <!-- Budget Manager Widget -->
+            <div class="budget-card glass-panel">
+                <div class="budget-header">
+                    <span class="label">本月預算進度</span>
+                    <button id="btn-edit-budget" class="btn-icon-small" title="設定預算">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    </button>
+                </div>
+                <div class="budget-amounts">
+                    <span class="budget-spent" id="budget-spent">$0</span>
+                    <span class="budget-divider">/</span>
+                    <span class="budget-total" id="budget-total">$15,000</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="budget-progress" style="width: 0%"></div>
+                </div>
+                <div class="budget-footer">
+                    <span id="budget-status-text">剩餘 $15,000 (100%)</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="app-main">
+            <!-- Top Dashboard Stats -->
+            <section class="stats-grid">
+                <div class="stat-card glass-panel count-up">
+                    <div class="stat-icon icon-expense">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="label">本月總支出</span>
+                        <h2 id="stat-month-total">$0</h2>
+                    </div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-icon icon-today">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="label">今日支出</span>
+                        <h2 id="stat-today-total">$0</h2>
+                    </div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-icon icon-avg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="label">日平均支出</span>
+                        <h2 id="stat-daily-avg">$0</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Voice Control Hub & Quick Add -->
+            <section class="voice-section glass-panel">
+                <div class="voice-header">
+                    <h3>語音記帳輸入</h3>
+                    <div class="voice-badge active" id="voice-indicator">
+                        <span class="indicator-dot"></span>
+                        <span id="voice-status">準備就緒</span>
+                    </div>
+                </div>
+                
+                <div class="voice-control-wrapper">
+                    <!-- Interactive Mic Wave Button -->
+                    <button id="btn-mic" class="btn-mic" aria-label="語音輸入">
+                        <div class="mic-glow"></div>
+                        <div class="mic-wave" id="mic-wave">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="mic-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                        </div>
+                    </button>
+                    
+                    <div class="voice-tip-text">
+                        點擊麥克風說出消費。例如：「<span class="clickable-tip">中午吃牛肉麵花了 180 元</span>」或「<span class="clickable-tip">搭計程車兩百五十元</span>」
+                    </div>
+                </div>
+
+                <div class="transcript-display-box" id="transcript-box">
+                    <p class="placeholder-text" id="transcript-text">語音辨識內容將會即時顯示在此處...</p>
+                </div>
+
+                <!-- Toggle to Manual / Text Mode -->
+                <div class="manual-input-box">
+                    <div class="input-divider">
+                        <span>或手動輸入文字進行智慧解析</span>
+                    </div>
+                    <form id="text-parse-form" class="quick-add-form">
+                        <input type="text" id="manual-text-input" placeholder="例如：買一杯咖啡 85 元..." required>
+                        <button type="submit" class="btn-primary">智慧解析</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Visual Charts Section -->
+            <section class="charts-section">
+                <!-- Pie Chart -->
+                <div class="chart-card glass-panel" id="category-chart-card">
+                    <div class="chart-header">
+                        <h3>支出類別佔比</h3>
+                    </div>
+                    <div class="chart-content pie-container">
+                        <div class="svg-chart-wrapper" id="pie-chart-wrapper">
+                            <!-- Custom interactive SVG will be injected here -->
+                        </div>
+                        <div class="chart-legend" id="pie-legend">
+                            <!-- Legend details will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trend Line Chart -->
+                <div class="chart-card glass-panel" id="trend-chart-card">
+                    <div class="chart-header">
+                        <h3>最近 7 天消費趨勢</h3>
+                    </div>
+                    <div class="chart-content trend-container">
+                        <div class="svg-chart-wrapper" id="trend-chart-wrapper">
+                            <!-- Custom line SVG will be injected here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History List Section -->
+            <section class="history-section glass-panel">
+                <div class="history-header">
+                    <h3>消費紀錄明細</h3>
+                    
+                    <div class="filters-wrapper">
+                        <!-- Search Box -->
+                        <div class="search-box">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            <input type="text" id="search-input" placeholder="搜尋描述或金額...">
+                        </div>
+                        
+                        <!-- Category Filter dropdown -->
+                        <select id="category-filter" class="select-styled">
+                            <option value="all">所有類別</option>
+                            <option value="食">食 (飲食)</option>
+                            <option value="衣">衣 (服飾)</option>
+                            <option value="住">住 (居家)</option>
+                            <option value="行">行 (交通)</option>
+                            <option value="育">育 (教育)</option>
+                            <option value="樂">樂 (娛樂)</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Record List Container -->
+                <div class="records-container">
+                    <div class="records-table-header">
+                        <span class="col-date">日期</span>
+                        <span class="col-item">消費項目</span>
+                        <span class="col-category">類別</span>
+                        <span class="col-amount">金額</span>
+                        <span class="col-actions">操作</span>
+                    </div>
+                    <div class="records-list" id="records-list">
+                        <!-- Items dynamically generated -->
+                    </div>
+                    <div class="empty-state" id="empty-state">
+                        <div class="empty-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+                        </div>
+                        <p>尚無消費紀錄。立刻使用語音或輸入文字來記帳吧！</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Smart Confirmation Overlay Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-card glass-panel card-glow animate-scale-up">
+            <div class="modal-header">
+                <h3>確認記帳內容</h3>
+                <button class="btn-close-modal" id="btn-close-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
+            </div>
+            
+            <div class="ai-analysis-feedback">
+                <div class="sparkle-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                </div>
+                <div class="feedback-text">
+                    <span class="title">AI 智慧解析結果</span>
+                    <p id="raw-transcript-feedback">「辨識出的原文」</p>
+                </div>
+            </div>
+
+            <form id="record-confirm-form" class="modal-form">
+                <div class="form-group">
+                    <label for="modal-date">日期</label>
+                    <input type="date" id="modal-date" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group flex-2">
+                        <label for="modal-item">項目描述</label>
+                        <input type="text" id="modal-item" placeholder="例如：午餐、捷運、衣服" required autocomplete="off">
+                    </div>
+                    
+                    <div class="form-group flex-1">
+                        <label for="modal-category">消費類別</label>
+                        <select id="modal-category" required>
+                            <option value="食">食 (飲食)</option>
+                            <option value="衣">衣 (服飾)</option>
+                            <option value="住">住 (居家)</option>
+                            <option value="行">行 (交通)</option>
+                            <option value="育">育 (教育)</option>
+                            <option value="樂">樂 (娛樂)</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="modal-amount">支出金額 (NTD)</label>
+                    <div class="amount-input-wrapper">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="modal-amount" min="1" step="any" placeholder="0" required>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="btn-modal-cancel" class="btn-secondary">取消</button>
+                    <button type="submit" id="btn-modal-confirm" class="btn-primary">確認新增</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Budget Settings Modal -->
+    <div class="modal-overlay" id="budget-modal">
+        <div class="modal-card glass-panel animate-scale-up" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>設定每月預算上限</h3>
+                <button class="btn-close-modal" id="btn-close-budget-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
+            </div>
+            
+            <form id="budget-settings-form" class="modal-form">
+                <div class="form-group">
+                    <label for="input-budget-amount">月預算額度 (NTD)</label>
+                    <div class="amount-input-wrapper">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="input-budget-amount" min="100" step="100" placeholder="15000" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="btn-budget-cancel" class="btn-secondary">取消</button>
+                    <button type="submit" class="btn-primary">儲存設定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
