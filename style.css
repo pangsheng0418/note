@@ -1253,22 +1253,212 @@ body {
     filter: drop-shadow(0 0 6px rgba(0, 242, 254, 0.4));
 }
 
+/* Settings Section styles */
+.settings-section {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.settings-header h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.settings-group {
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.settings-group h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.settings-tip {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.settings-row-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.settings-row-action strong {
+    color: var(--accent-cyan);
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+}
+
+.settings-buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.btn-small {
+    padding: 0.45rem 1rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 8px !important;
+}
+
+/* Premium colored glow buttons */
+.btn-primary-glow {
+    background: var(--primary-gradient);
+    color: #070a13;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition-smooth);
+    box-shadow: var(--cyan-glow);
+}
+
+.btn-primary-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+}
+
+.btn-success-glow {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition-smooth);
+    box-shadow: var(--emerald-glow);
+}
+
+.btn-success-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+}
+
+.btn-danger-glow {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition-smooth);
+    box-shadow: var(--pink-glow);
+}
+
+.btn-danger-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+}
+
+.danger-zone {
+    border-color: rgba(239, 68, 68, 0.25);
+    background: rgba(239, 68, 68, 0.03);
+}
+
+.danger-zone h4 {
+    color: #f87171;
+}
+
 /* Responsive Overrides */
 @media (max-width: 768px) {
     .app-container {
-        padding: 1.5rem 1rem 85px 1rem; /* Extra padding bottom for fixed bottom-nav */
-        gap: 1.5rem;
+        padding: 1.25rem 0.75rem 85px 0.75rem; /* Compact padding for mobile */
+        gap: 1.25rem;
     }
     
     .bottom-nav {
         display: flex;
     }
 
-    /* Default hide sections on mobile, toggle when active tab is selected */
+    /* Mobile Header Layout Enhancements */
+    .app-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .logo-area {
+        justify-content: center;
+    }
+
+    .logo-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+
+    .logo-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .logo-text h1 {
+        font-size: 1.4rem;
+    }
+
+    .logo-text span {
+        font-size: 0.65rem;
+        letter-spacing: 1.5px;
+    }
+
+    /* Mobile Budget Widget Enhancements */
+    .app-header .budget-card {
+        display: none; /* Hide globally in header on mobile */
+        padding: 1rem 1.25rem;
+    }
+
+    body.mobile-active-dashboard .app-header .budget-card {
+        display: block; /* Show ONLY in dashboard tab on mobile */
+    }
+
+    /* Hide/Show main views based on active bottom tab */
     #mobile-sec-stats,
     #mobile-sec-charts,
     #mobile-sec-voice,
-    #mobile-sec-history {
+    #mobile-sec-history,
+    #mobile-sec-settings {
         display: none !important;
     }
 
@@ -1286,10 +1476,9 @@ body {
     body.mobile-active-history #mobile-sec-history {
         display: flex !important;
     }
-    
-    .app-header {
-        flex-direction: column;
-        align-items: stretch;
+
+    body.mobile-active-settings #mobile-sec-settings {
+        display: flex !important;
     }
     
     .budget-card {
@@ -1306,19 +1495,25 @@ body {
             "item amount"
             "date category"
             "actions actions";
-        gap: 0.5rem;
+        gap: 0.4rem;
         padding: 1rem;
-        position: relative;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-color);
+        margin-bottom: 0.5rem;
     }
     
     .col-date {
         grid-area: date;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
     }
     
     .col-item {
         grid-area: item;
-        font-size: 1rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-main);
     }
     
     .col-category {
@@ -1328,18 +1523,38 @@ body {
     
     .col-amount {
         grid-area: amount;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
+        font-weight: 700;
         justify-self: end;
+        color: var(--accent-cyan);
     }
     
     .col-actions {
         grid-area: actions;
         justify-self: end;
-        border-top: 1px dashed rgba(255,255,255,0.03);
+        border-top: 1px dashed rgba(255,255,255,0.06);
         width: 100%;
-        padding-top: 0.4rem;
-        margin-top: 0.2rem;
+        padding-top: 0.5rem;
+        margin-top: 0.25rem;
+        display: flex;
         justify-content: flex-end;
+    }
+
+    .btn-delete {
+        padding: 6px 12px;
+        background: rgba(244, 63, 94, 0.06);
+        border: 1px solid rgba(244, 63, 94, 0.15);
+        border-radius: 6px;
+        color: var(--accent-pink);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+    }
+
+    .btn-delete::after {
+        content: '刪除';
+        font-weight: 500;
     }
 
     .pie-container {
@@ -1355,5 +1570,9 @@ body {
 
     .form-row {
         flex-direction: column;
+    }
+
+    .settings-buttons-grid {
+        grid-template-columns: 1fr;
     }
 }

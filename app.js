@@ -338,7 +338,16 @@ class App {
             // SVG Wrappers
             pieChartWrapper: document.getElementById('pie-chart-wrapper'),
             pieLegend: document.getElementById('pie-legend'),
-            trendChartWrapper: document.getElementById('trend-chart-wrapper')
+            trendChartWrapper: document.getElementById('trend-chart-wrapper'),
+            
+            // Settings Panel References
+            settingsBudgetLabel: document.getElementById('settings-budget-label'),
+            btnSettingsEditBudget: document.getElementById('btn-settings-edit-budget'),
+            btnExportBackup: document.getElementById('btn-export-backup'),
+            btnTriggerImport: document.getElementById('btn-trigger-import'),
+            importFileInput: document.getElementById('import-file-input'),
+            btnExportCsv: document.getElementById('btn-export-csv'),
+            btnClearAll: document.getElementById('btn-clear-all')
         };
 
         this.initSpeechRecognition();
@@ -533,6 +542,126 @@ class App {
                 this.renderAll();
             }
         });
+
+        // Setup settings panel events
+        this.bindSettingsEvents();
+    }
+
+    bindSettingsEvents() {
+        // Edit budget in settings
+        if (this.dom.btnSettingsEditBudget) {
+            this.dom.btnSettingsEditBudget.addEventListener('click', () => {
+                this.dom.inputBudgetAmount.value = this.manager.budget;
+                this.dom.budgetModal.classList.add('active');
+            });
+        }
+
+        // Trigger file import
+        if (this.dom.btnTriggerImport) {
+            this.dom.btnTriggerImport.addEventListener('click', () => {
+                this.dom.importFileInput.click();
+            });
+        }
+
+        // File import handler
+        if (this.dom.importFileInput) {
+            this.dom.importFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        const data = JSON.parse(evt.target.result);
+                        if (!data || !Array.isArray(data.records)) {
+                            alert('還原失敗：匯入檔案格式不正確！');
+                            return;
+                        }
+                        
+                        // Update LocalStorage
+                        localStorage.setItem('expense_records', JSON.stringify(data.records));
+                        localStorage.setItem('expense_budget', data.budget || 0);
+                        
+                        // Reload manager
+                        this.manager.records = data.records;
+                        this.manager.budget = data.budget || 0;
+                        
+                        alert('資料還原成功！');
+                        this.renderAll();
+                    } catch (err) {
+                        alert('還原失敗：無法解析 JSON 檔案！');
+                    }
+                    this.dom.importFileInput.value = '';
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        // Export JSON Backup
+        if (this.dom.btnExportBackup) {
+            this.dom.btnExportBackup.addEventListener('click', () => {
+                const data = {
+                    records: this.manager.records,
+                    budget: this.manager.budget
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const dateStr = new Date().toISOString().split('T')[0];
+                a.href = url;
+                a.download = `voice-expense-backup-${dateStr}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // Export CSV Excel
+        if (this.dom.btnExportCsv) {
+            this.dom.btnExportCsv.addEventListener('click', () => {
+                if (this.manager.records.length === 0) {
+                    alert('目前沒有消費紀錄可供匯出！');
+                    return;
+                }
+                
+                // Build CSV Content with UTF-8 BOM
+                let csvContent = '\uFEFF'; 
+                csvContent += '日期,消費項目,類別,金額\n';
+                
+                this.manager.records.forEach(r => {
+                    const cleanItem = r.item.replace(/"/g, '""');
+                    csvContent += `${r.date},"${cleanItem}",${r.category},${r.amount}\n`;
+                });
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const dateStr = new Date().toISOString().split('T')[0];
+                a.href = url;
+                a.download = `expense-export-${dateStr}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // Clear All Data
+        if (this.dom.btnClearAll) {
+            this.dom.btnClearAll.addEventListener('click', () => {
+                if (confirm('⚠️ 警告：確定要清空所有資料嗎？這會永久刪除所有記帳明細與預算設定，且無法復原！')) {
+                    localStorage.removeItem('expense_records');
+                    localStorage.removeItem('expense_budget');
+                    
+                    this.manager.records = [];
+                    this.manager.budget = 0;
+                    
+                    alert('所有資料已成功清空！');
+                    this.renderAll();
+                }
+            });
+        }
     }
 
     initMobileTabs() {
@@ -552,7 +681,7 @@ class App {
                 const tab = item.getAttribute('data-tab');
                 
                 // Remove all tab classes on body
-                document.body.classList.remove('mobile-active-dashboard', 'mobile-active-voice', 'mobile-active-history');
+                document.body.classList.remove('mobile-active-dashboard', 'mobile-active-voice', 'mobile-active-history', 'mobile-active-settings');
                 
                 // Add target active tab class on body
                 if (tab === 'tab-dashboard') {
@@ -561,6 +690,8 @@ class App {
                     document.body.classList.add('mobile-active-voice');
                 } else if (tab === 'tab-history') {
                     document.body.classList.add('mobile-active-history');
+                } else if (tab === 'tab-settings') {
+                    document.body.classList.add('mobile-active-settings');
                 }
             });
         });
@@ -602,6 +733,11 @@ class App {
         this.renderBudget();
         this.renderRecordsList();
         this.renderCharts();
+        
+        // Update settings budget label
+        if (this.dom.settingsBudgetLabel) {
+            this.dom.settingsBudgetLabel.textContent = `$${this.manager.budget.toLocaleString()}`;
+        }
     }
 
     renderStats() {
