@@ -212,7 +212,7 @@ function parseChineseNumber(str) {
 function parseExpense(text) {
     // 1. Keyword mapping for Categories
     const categoryKeywords = {
-        '食': ['吃', '喝', '餐', '飯', '麵', '早餐', '午餐', '晚餐', '宵夜', '飲料', '咖啡', '星巴克', '漢堡', '牛排', '超市', '買菜', '火鍋', '點心', '零食'],
+        '食': ['吃', '喝', '餐', '飯', '麵', '早餐', '午餐', '晚餐', '宵夜', '飲料', '咖啡', '星巴克', '漢堡', '牛排', '超市', '買菜', '買水果', '水果', '蔬菜', '菜', '火鍋', '點心', '零食'],
         '衣': ['衣', '鞋', '褲', '外套', '裙', '襪', '帽', '飾品', '買衣服', '襯衫', '服飾'],
         '住': ['房租', '水電', '瓦斯', '裝潢', '日用品', '衛生紙', '家具', '垃圾袋', '房貸', '寬頻', '管理費', '清潔'],
         '行': ['車', '捷運', '公車', '高鐵', '火車', '計程車', '加油', '汽油', '機車', '悠遊卡', '加值', 'Uber', '機票', '高架', '停車'],
@@ -343,6 +343,7 @@ class App {
 
         this.initSpeechRecognition();
         this.bindEvents();
+        this.initMobileTabs();
         this.renderAll();
     }
 
@@ -355,6 +356,25 @@ class App {
             this.dom.btnMic.style.opacity = '0.5';
             this.dom.btnMic.style.cursor = 'not-allowed';
             this.dom.btnMic.title = '您的瀏覽器不支持 Speech Recognition API，請手動輸入文字';
+            return;
+        }
+
+        if (window.location.protocol === 'file:') {
+            this.dom.voiceStatus.textContent = '本地檔案不支援語音';
+            this.dom.voiceIndicator.style.background = 'rgba(245, 158, 11, 0.08)';
+            this.dom.voiceIndicator.style.color = 'var(--accent-amber)';
+            const dot = this.dom.voiceIndicator.querySelector('.indicator-dot');
+            if (dot) {
+                dot.style.backgroundColor = 'var(--accent-amber)';
+                dot.style.boxShadow = '0 0 8px var(--accent-amber)';
+            }
+            this.dom.transcriptText.innerHTML = '您目前正以本地檔案協定 (`file://`) 開啟網頁。由於瀏覽器安全限制，本地檔案無法使用語音功能。<br><br>💡 <b>解決方法</b>：請使用本地伺服器（例如在專案目錄下執行 <code>npx http-server</code>）以 <code>http://localhost</code> 開啟此網頁。或者，您也可以直接在下方<b>手動輸入文字</b>進行智慧解析記帳。';
+            this.dom.transcriptText.classList.remove('placeholder-text');
+            
+            this.recognition = null;
+            this.dom.btnMic.style.opacity = '0.5';
+            this.dom.btnMic.style.cursor = 'not-allowed';
+            this.dom.btnMic.title = '由於瀏覽器安全限制，本地檔案 (file://) 不支援語音功能，請用 localhost 伺服器開啟。';
             return;
         }
 
@@ -512,6 +532,37 @@ class App {
                 this.dom.budgetModal.classList.remove('active');
                 this.renderAll();
             }
+        });
+    }
+
+    initMobileTabs() {
+        // Default to dashboard tab on mobile
+        document.body.classList.add('mobile-active-dashboard');
+        
+        const navItems = document.querySelectorAll('#bottom-nav .nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Clear active states on tabs
+                navItems.forEach(nav => nav.classList.remove('active'));
+                
+                // Set active class on clicked tab
+                item.classList.add('active');
+                
+                // Get target tab
+                const tab = item.getAttribute('data-tab');
+                
+                // Remove all tab classes on body
+                document.body.classList.remove('mobile-active-dashboard', 'mobile-active-voice', 'mobile-active-history');
+                
+                // Add target active tab class on body
+                if (tab === 'tab-dashboard') {
+                    document.body.classList.add('mobile-active-dashboard');
+                } else if (tab === 'tab-voice') {
+                    document.body.classList.add('mobile-active-voice');
+                } else if (tab === 'tab-history') {
+                    document.body.classList.add('mobile-active-history');
+                }
+            });
         });
     }
 

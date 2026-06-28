@@ -1199,11 +1199,92 @@ body {
     opacity: 1;
 }
 
+/* Bottom Nav styling */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: rgba(16, 22, 42, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-top: 1px solid var(--border-color);
+    z-index: 999;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 1rem;
+    box-shadow: 0 -8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.nav-item {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    width: 80px;
+    height: 100%;
+    transition: var(--transition-smooth);
+    font-family: var(--font-sans);
+}
+
+.nav-item svg {
+    transition: var(--transition-smooth);
+}
+
+.nav-item span {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: var(--accent-cyan);
+}
+
+.nav-item.active svg {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 0 6px rgba(0, 242, 254, 0.4));
+}
+
 /* Responsive Overrides */
 @media (max-width: 768px) {
     .app-container {
-        padding: 1.5rem 1rem;
+        padding: 1.5rem 1rem 85px 1rem; /* Extra padding bottom for fixed bottom-nav */
         gap: 1.5rem;
+    }
+    
+    .bottom-nav {
+        display: flex;
+    }
+
+    /* Default hide sections on mobile, toggle when active tab is selected */
+    #mobile-sec-stats,
+    #mobile-sec-charts,
+    #mobile-sec-voice,
+    #mobile-sec-history {
+        display: none !important;
+    }
+
+    body.mobile-active-dashboard #mobile-sec-stats {
+        display: grid !important;
+    }
+    body.mobile-active-dashboard #mobile-sec-charts {
+        display: grid !important;
+    }
+
+    body.mobile-active-voice #mobile-sec-voice {
+        display: flex !important;
+    }
+
+    body.mobile-active-history #mobile-sec-history {
+        display: flex !important;
     }
     
     .app-header {
